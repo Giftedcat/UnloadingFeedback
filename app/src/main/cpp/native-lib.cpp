@@ -12,19 +12,22 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_giftedcat_unloadingfeedback_utils_JniUtil_fork(JNIEnv *env, jclass type) {
 
-    //获取分叉处的进程编号
-    int pid = fork();
+    //获取分叉出来的进程编号
+    int id = fork();
     //父进程编号
     int ppid;
+    //进程编号
+    int pid;
     FILE *file;
-    if (pid == 0) {
-        //进程编号为0，说明是子进程
-        LOGD("child progress pid = %d", pid);
+    if (id == 0) {
+        //分叉出来的进程编号为0，说明已经无法再分叉了，是子进程
         while (1) {
             sleep(2);
+            //获取进程编号
+            pid = getpid();
             //获取父进程编号
             ppid = getppid();
-            LOGD("child progress ppid = %d", ppid);
+            LOGD("progress is Running && pid = %d && ppid = %d", pid, ppid);
             //父进程编号为1，说明父进程已经被杀死，这时子进程的父进程就变成了系统进程，即为1
             if (ppid == 1) {
                 //根据包名获取该app的文件
@@ -37,14 +40,8 @@ Java_com_giftedcat_unloadingfeedback_utils_JniUtil_fork(JNIEnv *env, jclass type
                 }
             }
         }
-    } else if (pid > 0) {
-        //进程编号大于0，说明是父进程
-        while (1) {
-            sleep(2);
-            LOGD("parent Progress pid = %d", pid);
-        }
-    } else{
-        LOGD("parent Progress pid < 0");
+    } else if (id > 0){
+        // 分叉出来的编号大于0，说明是主进程
     }
 
 }
